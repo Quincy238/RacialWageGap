@@ -1,0 +1,183 @@
+---
+title: "Wage Comparison Between Ethnic Groups in the Technology Sector"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: columns
+    vertical_layout: fill
+runtime: shiny
+---
+
+```{r setup, include=FALSE, cashe = TRUE}
+library(flexdashboard)
+library(shiny)
+library(tidyverse)
+library(ggpubr)
+library(rstatix)
+library(rmarkdown)
+library(knitr)
+library(stargazer)
+library(ggplot2)
+library(vctrs)
+library(plyr)
+library(dplyr)
+library(plotly)
+
+mywd <- "C:/Users/Quinc/OneDrive/Murray State/Spring 2021/CIS 361"
+setwd(mywd)
+
+
+myfile <- "survey_results_public.csv"
+
+Alldata <- read.csv(file = myfile, header = TRUE, sep = ",")
+
+SmallData <- dplyr::select(Alldata, Respondent, Employment, Country, Ethnicity, DevType
+                    , YearsCode, CompTotal, WorkWeekHrs, Age, Gender)
+SmallData <-na.omit(SmallData)
+
+FromUSA <- SmallData %>% filter(Country == 'United States', Employment == 'Employed full-time')
+
+#Remove rows with null values
+FromUSA <- na.omit(FromUSA)
+
+#Narrowing the scope of DevTypes
+FromUSA[] <- FromUSA %>% 
+  group_by(DevType) %>%
+  arrange(DevType)
+i <- 0
+while (i <= 533){
+  FromUSA$DevType[i] <- "Academic researcher"
+  i = i + 1
+}
+while (i <= 1490){
+  FromUSA$DevType[i] <- "Data or business analyst"
+  i = i + 1
+}
+while (i <= 2000){
+  FromUSA$DevType[i] <- "Data scientist or machine learning specialist"
+  i = i + 1
+}
+while (i <= 2943){
+  FromUSA$DevType[i] <- "Database administrator"
+  i = i + 1
+}
+while (i <= 3620){
+  FromUSA$DevType[i] <- "Designer"
+  i = i + 1
+}
+while (i <= 12083 ){
+  FromUSA$DevType[i] <- "Developer"
+  i = i + 1
+} 
+while (i <= 12200 ){
+  FromUSA$DevType[i] <- "DevOps specialist"
+  i = i + 1
+} 
+while (i <= 12221 ){
+  FromUSA$DevType[i] <- "Educator"
+  i = i + 1
+}
+while (i <= 12433  ){
+  FromUSA$DevType[i] <- "Engineer"
+  i = i + 1
+}
+while (i <= 12465 ){
+  FromUSA$DevType[i] <- "Product manager"
+  i = i + 1
+}
+while (i <= 12488  ){
+  FromUSA$DevType[i] <- "Scientist"
+  i = i + 1
+}
+while (i <= 12537 ){
+  FromUSA$DevType[i] <- "Senior executive/VP"
+  i = i + 1
+}
+while (i <= 12541 ){
+  FromUSA$DevType[i] <- "Student"
+  i = i + 1
+} 
+
+FromUSA$YearsCode[grepl("More than 50 years",FromUSA$YearsCode)]<-'55'
+FromUSA$YearsCode[grepl("Less than 1 year",FromUSA$YearsCode)]<-'1'
+FromUSA$YearsCode <- as.numeric(FromUSA$YearsCode)
+
+DevTypeVsEthnicity <- FromUSA %>% 
+  select(c(DevType, Ethnicity, WorkWeekHrs, CompTotal, Age, YearsCode)) %>%
+  group_by(DevType, Ethnicity) %>%
+  dplyr::summarise(NumberOfPeople = n(), AveragePay = mean(CompTotal), AverageHrsPerWeek = mean(WorkWeekHrs), AverageAge = mean(Age), AverageYearsExperience = mean(YearsCode))
+
+
+#DF (Ethnicity, DevType, AveragePay)
+DevType_Ethnicity_Pay<- DevTypeVsEthnicity %>%
+  dplyr::select(Ethnicity, DevType, AveragePay)
+
+
+#DF (Ethnicity, DevType,AverageYearsExperience)
+DevType_Ethnicity_Exp <- DevTypeVsEthnicity %>%
+ dplyr::select(Ethnicity, DevType,AverageYearsExperience)
+
+FlexData <- dplyr::select(FromUSA, Ethnicity, DevType
+                    , CompTotal)
+
+EthnicCount <- FromUSA %>% 
+  select( c(Ethnicity, CompTotal, WorkWeekHrs, Age)) %>%
+  group_by(Ethnicity) %>%
+  dplyr::summarise(NumberOfPeople = n(), AveragePay = mean(CompTotal), AverageHrsPerWeek = mean(WorkWeekHrs), 
+            AverageAge = mean(Age))
+
+
+DevType <- FromUSA %>% 
+  select(c(DevType, Ethnicity, WorkWeekHrs, CompTotal, Age)) %>%
+  group_by(DevType) %>%
+  dplyr::summarise(NumberOfPeople = n(), AveragePay = mean(CompTotal), AverageHrsPerWeek = mean(WorkWeekHrs), 
+            AverageAge = mean(Age))
+AnovaDevtypeEthPay <- DevType_Ethnicity_Pay %>% 
+  group_by(DevType, Ethnicity) %>%
+  get_summary_stats(AveragePay, type = "mean")
+#Summary of mean Experience Group by DevType, Ethnicity
+#AnovaDevtypeEthExp <- DevType_Ethnicity_Exp %>% 
+ # facet_wrap(~DevType) %>%
+  #group_by(DevType, Ethnicity) %>% 
+   # get_summary_stats(AverageYearsExperience, type = "mean")
+
+EthnicityList <- as.list(AnovaDevtypeEthPay$Ethnicity)
+DevList <- as.list(AnovaDevtypeEthPay$DevType)
+
+```
+
+Column {.sidebar}
+-----------------------------------------------------------------------
+
+### Your Choices
+
+```{r input}
+selectInput("Ethchoice", label = "Ethnicity", 
+            choices = EthnicityList, selected = "Biracial")
+selectInput("DevChoice", label = "DevType",
+            choices = DevList,
+            selected = "Academic researcher")
+
+
+```
+
+Column {data-width=350}
+-----------------------------------------------------------------------
+
+### Ethnicity
+
+```{r}
+options(scipen=999)
+    renderPlot({
+ggboxplot(AnovaDevtypeEthPay, x= input$EthChoice, y = "mean") +
+  labs(y = "Average Pay", x = "Ethnicity")  
+  
+      
+    #ggboxplot(DevType_Ethnicity_Pay, x= "input$DevChoice", y = "AveragePay") +
+  #labs(y = "Average Pay")  + facet_wrap(~input$Ethchoice) +
+  #scale_x_discrete(labels = c('A','B','C','D','E','F','G','H','I', 'J', 'K', 'L', 'M', 'N'))   
+  
+
+})
+
+```
+
