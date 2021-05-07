@@ -59,64 +59,41 @@ plot(NumPeoplePerEthnicity)
 
 
 
-BiracialAll <- FromUSA %>%
-  select(, DevType, Ethnicity, WorkWeekHrs, CompTotal, Age, YearsCode) %>%
-  filter(Ethnicity == 'Biracial') %>% 
-dplyr::summarise(NumberOfPeople = n()) 
 
-BiracialSummary <- FromUSA %>%
+
+Biracial <- FromUSA %>%
   select(DevType, Ethnicity, WorkWeekHrs, CompTotal, Age, YearsCode) %>%
-  group_by(DevType) %>%
-  filter(Ethnicity == 'Biracial') %>%
-dplyr::summarize(NumberOfPeople = n(), AveragePay = mean(CompTotal), AverageHrsPerWeek = mean(WorkWeekHrs), 
-                 AverageAge = mean(Age), AverageYearsExperience = mean(YearsCode))
+  filter(Ethnicity == 'Biracial')
 
 BlackorofAfricandescent <- FromUSA %>%
   select(DevType, Ethnicity, WorkWeekHrs, CompTotal, Age, YearsCode) %>%
-  group_by(DevType) %>%
-  filter(Ethnicity == 'Black or of African descent') %>%
-dplyr::summarize(NumberOfPeople = n(), AveragePay = mean(CompTotal), AverageHrsPerWeek = mean(WorkWeekHrs), 
-                 AverageAge = mean(Age), AverageYearsExperience = mean(YearsCode))
+  filter(Ethnicity == 'Black or of African descent')
+
 
 EastAsian <- FromUSA %>%
   select(DevType, Ethnicity, WorkWeekHrs, CompTotal, Age, YearsCode) %>%
   filter(Ethnicity == 'East Asian')%>%
-  dplyr::summarize(NumberOfPeople = n(), AveragePay = mean(CompTotal), AverageHrsPerWeek = mean(WorkWeekHrs), 
-                   AverageAge = mean(Age), AverageYearsExperience = mean(YearsCode))
+
 
 Hispanic <- FromUSA %>%
   select(DevType, Ethnicity, WorkWeekHrs, CompTotal, Age, YearsCode) %>%
-  group_by(DevType) %>%
-  filter(Ethnicity == 'Hispanic or Latino/Latina')%>%
-  dplyr::summarize(NumberOfPeople = n(), AveragePay = mean(CompTotal), AverageHrsPerWeek = mean(WorkWeekHrs), 
-                   AverageAge = mean(Age), AverageYearsExperience = mean(YearsCode))
+  filter(Ethnicity == 'Hispanic or Latino/Latina')
+
 
 
 MiddleEastern <- FromUSA %>%
   select(DevType, Ethnicity, WorkWeekHrs, CompTotal, Age, YearsCode) %>%
-  group_by(DevType) %>%
-  filter(Ethnicity == 'Middle Eastern')%>%
-  dplyr::summarize(NumberOfPeople = n(), AveragePay = mean(CompTotal), AverageHrsPerWeek = mean(WorkWeekHrs), 
-                   AverageAge = mean(Age), AverageYearsExperience = mean(YearsCode))
+  filter(Ethnicity == 'Middle Eastern')
 
 Native <- FromUSA %>%
   select(DevType, Ethnicity, WorkWeekHrs, CompTotal, Age, YearsCode) %>%
-  group_by(DevType) %>%
-  filter(Ethnicity == 'Native American, Pacific Islander, or Indigenous Australian')%>%
-  dplyr::summarize(NumberOfPeople = n(), AveragePay = mean(CompTotal), AverageHrsPerWeek = mean(WorkWeekHrs), 
-                   AverageAge = mean(Age), AverageYearsExperience = mean(YearsCode))
+  filter(Ethnicity == 'Native American, Pacific Islander, or Indigenous Australian')
 
 
 SouthAsian <- FromUSA %>%
   select(DevType, Ethnicity, WorkWeekHrs, CompTotal, Age, YearsCode) %>%
-  group_by(DevType) %>%
-  filter(Ethnicity == 'South Asian')%>%
-  dplyr::summarize(NumberOfPeople = n(), AveragePay = mean(CompTotal), AverageHrsPerWeek = mean(WorkWeekHrs), 
-                   AverageAge = mean(Age), AverageYearsExperience = mean(YearsCode))
+  filter(Ethnicity == 'South Asian') 
 
 WhiteorEuropeandescent <- FromUSA %>%
   select(DevType, Ethnicity, WorkWeekHrs, CompTotal, Age, YearsCode) %>%
-  group_by(DevType) %>%
-  filter(Ethnicity == 'White or of European descent')%>%
-  dplyr::summarize(NumberOfPeople = n(), AveragePay = mean(CompTotal), AverageHrsPerWeek = mean(WorkWeekHrs), 
-                   AverageAge = mean(Age), AverageYearsExperience = mean(YearsCode))
+  filter(Ethnicity == 'White or of European descent')

@@ -3,7 +3,6 @@ title: "Wage Comparison Between Ethnic Groups in the Technology Sector"
 output: 
   flexdashboard::flex_dashboard:
     orientation: columns
-    vertical_layout: fill
 runtime: shiny
 ---
 
@@ -101,83 +100,149 @@ FromUSA$YearsCode[grepl("More than 50 years",FromUSA$YearsCode)]<-'55'
 FromUSA$YearsCode[grepl("Less than 1 year",FromUSA$YearsCode)]<-'1'
 FromUSA$YearsCode <- as.numeric(FromUSA$YearsCode)
 
-DevTypeVsEthnicity <- FromUSA %>% 
-  select(c(DevType, Ethnicity, WorkWeekHrs, CompTotal, Age, YearsCode)) %>%
-  group_by(DevType, Ethnicity) %>%
-  dplyr::summarise(NumberOfPeople = n(), AveragePay = mean(CompTotal), AverageHrsPerWeek = mean(WorkWeekHrs), AverageAge = mean(Age), AverageYearsExperience = mean(YearsCode))
+Biracial <- FromUSA %>%
+  select(DevType, Ethnicity, WorkWeekHrs, CompTotal, Age, YearsCode) %>%
+  filter(Ethnicity == 'Biracial')
+
+BlackorofAfricandescent <- FromUSA %>%
+  select(DevType, Ethnicity, WorkWeekHrs, CompTotal, Age, YearsCode) %>%
+  filter(Ethnicity == 'Black or of African descent')
 
 
-#DF (Ethnicity, DevType, AveragePay)
-DevType_Ethnicity_Pay<- DevTypeVsEthnicity %>%
-  dplyr::select(Ethnicity, DevType, AveragePay)
+EastAsian <- FromUSA %>%
+  select(DevType, Ethnicity, WorkWeekHrs, CompTotal, Age, YearsCode) %>%
+  filter(Ethnicity == 'East Asian')
 
 
-#DF (Ethnicity, DevType,AverageYearsExperience)
-DevType_Ethnicity_Exp <- DevTypeVsEthnicity %>%
- dplyr::select(Ethnicity, DevType,AverageYearsExperience)
-
-FlexData <- dplyr::select(FromUSA, Ethnicity, DevType
-                    , CompTotal)
-
-EthnicCount <- FromUSA %>% 
-  select( c(Ethnicity, CompTotal, WorkWeekHrs, Age)) %>%
-  group_by(Ethnicity) %>%
-  dplyr::summarise(NumberOfPeople = n(), AveragePay = mean(CompTotal), AverageHrsPerWeek = mean(WorkWeekHrs), 
-            AverageAge = mean(Age))
+Hispanic <- FromUSA %>%
+  select(DevType, Ethnicity, WorkWeekHrs, CompTotal, Age, YearsCode) %>%
+  filter(Ethnicity == 'Hispanic or Latino/Latina')
 
 
-DevType <- FromUSA %>% 
-  select(c(DevType, Ethnicity, WorkWeekHrs, CompTotal, Age)) %>%
-  group_by(DevType) %>%
-  dplyr::summarise(NumberOfPeople = n(), AveragePay = mean(CompTotal), AverageHrsPerWeek = mean(WorkWeekHrs), 
-            AverageAge = mean(Age))
-AnovaDevtypeEthPay <- DevType_Ethnicity_Pay %>% 
-  group_by(DevType, Ethnicity) %>%
-  get_summary_stats(AveragePay, type = "mean")
-#Summary of mean Experience Group by DevType, Ethnicity
-#AnovaDevtypeEthExp <- DevType_Ethnicity_Exp %>% 
- # facet_wrap(~DevType) %>%
-  #group_by(DevType, Ethnicity) %>% 
-   # get_summary_stats(AverageYearsExperience, type = "mean")
 
-EthnicityList <- as.list(AnovaDevtypeEthPay$Ethnicity)
-DevList <- as.list(AnovaDevtypeEthPay$DevType)
+MiddleEastern <- FromUSA %>%
+  select(DevType, Ethnicity, WorkWeekHrs, CompTotal, Age, YearsCode) %>%
+  filter(Ethnicity == 'Middle Eastern')
 
+Native <- FromUSA %>%
+  select(DevType, Ethnicity, WorkWeekHrs, CompTotal, Age, YearsCode) %>%
+  filter(Ethnicity == 'Native American, Pacific Islander, or Indigenous Australian')
+
+
+SouthAsian <- FromUSA %>%
+  select(DevType, Ethnicity, WorkWeekHrs, CompTotal, Age, YearsCode) %>%
+  filter(Ethnicity == 'South Asian') 
+
+WhiteorEuropeandescent <- FromUSA %>%
+  select(DevType, Ethnicity, WorkWeekHrs, CompTotal, Age, YearsCode) %>%
+  filter(Ethnicity == 'White or of European descent')
+
+Multiracial <- FromUSA %>%
+  select(DevType, Ethnicity, WorkWeekHrs, CompTotal, Age, YearsCode) %>%
+  filter(Ethnicity == 'Multiracial')
 ```
 
-Column {.sidebar}
------------------------------------------------------------------------
+Multiracial
+=======================================================================
 
-### Your Choices
-
-```{r input}
-selectInput("Ethchoice", label = "Ethnicity", 
-            choices = EthnicityList, selected = "Biracial")
-selectInput("DevChoice", label = "DevType",
-            choices = DevList,
-            selected = "Academic researcher")
-
-
-```
-
-Column {data-width=350}
------------------------------------------------------------------------
-
-### Ethnicity
-
-```{r}
+```{r Multiracial}
 options(scipen=999)
-    renderPlot({
-ggboxplot(AnovaDevtypeEthPay, x= input$EthChoice, y = "mean") +
-  labs(y = "Average Pay", x = "Ethnicity")  
-  
-      
-    #ggboxplot(DevType_Ethnicity_Pay, x= "input$DevChoice", y = "AveragePay") +
-  #labs(y = "Average Pay")  + facet_wrap(~input$Ethchoice) +
-  #scale_x_discrete(labels = c('A','B','C','D','E','F','G','H','I', 'J', 'K', 'L', 'M', 'N'))   
-  
 
-})
 
+a <-ggplot(Multiracial, aes(x=DevType, y=CompTotal, fill = DevType))  +
+        geom_col() + labs(title="Multiracial",
+       y="Wage", x="Developer Type", caption="Multiracial") +
+  scale_x_discrete(labels = c('A','B','C','D','E','F','G','H','I','J','K','L', 'M','N'))
+  ggplotly(a)
+```
+
+White or European descent
+=======================================================================
+
+```{r WhiteorEuropeandescent}
+j <-ggplot(WhiteorEuropeandescent, aes(x=DevType, y=CompTotal, fill = DevType)) +
+        geom_col() + labs(title="White or European descent",
+       y="Wage", x="Developer Type", caption="White or European descent") +
+  scale_x_discrete(labels = c('A','B','C','D','E','F','G','H','I','J','K','L', 'M','N'))
+ggplotly(j)
+```
+
+South Asian
+=======================================================================
+
+```{r SouthAsian}
+h <-ggplot(SouthAsian, aes(x=DevType, y=CompTotal, fill = DevType))  +
+        geom_col() + labs(title="South Asian",
+       y="Wage", x="Developer Type", caption="South Asian") +
+  scale_x_discrete(labels = c('A','B','C','D','E','F','G','H','I','J','K','L', 'M','N'))
+ ggplotly(h)
+
+```
+
+Native American, Pacific Islander, or Indigenous Australian
+=======================================================================
+
+```{r Native}
+    g <-ggplot(Native, aes(x=DevType, y=CompTotal, fill = DevType))  +
+        geom_col() + labs(title="Native American, Pacific Islander, or Indigenous Australian",
+       y="Wage", x="Developer Type", caption="Native American, Pacific Islander, or Indigenous Australian") +
+  scale_x_discrete(labels = c('A','B','C','D','E','F','G','H','I','J','K','L', 'M','N'))
+ggplotly(g)
+```
+
+Middle Eastern
+=======================================================================
+
+```{r MiddleEastern}
+f <-ggplot(MiddleEastern, aes(x=DevType, y=CompTotal, fill = DevType))  +
+        geom_col() + labs(title="Middle Eastern",
+       y="Wage", x="Developer Type", caption="Middle Eastern") +
+  scale_x_discrete(labels = c('A','B','C','D','E','F','G','H','I','J','K','L', 'M','N'))
+ggplotly(f)
+```
+
+Hispanic or Latino/Latina
+=======================================================================
+
+```{r Hispanic}
+e <-ggplot(Hispanic, aes(x=DevType, y=CompTotal, fill = DevType))  +
+        geom_col() + labs(title="Hispanic or Latino/Latina",
+       y="Wage", x="Developer Type", caption="Hispanic or Latino/Latina") +
+  scale_x_discrete(labels = c('A','B','C','D','E','F','G','H','I','J','K','L', 'M','N'))
+ ggplotly(e)
+```
+
+East Asian
+=======================================================================
+
+```{r EastAsian}
+d <-ggplot(EastAsian, aes(x=DevType, y=CompTotal, fill = DevType))  +
+        geom_col() + labs(title="East Asian",
+       y="Wage", x="Developer Type", caption="East Asian") +
+  scale_x_discrete(labels = c('A','B','C','D','E','F','G','H','I','J','K','L', 'M','N'))
+ ggplotly(d)
+
+```
+
+Black or of African descent
+=======================================================================
+
+```{r BlackorofAfricandescent}
+c <-ggplot(BlackorofAfricandescent, aes(x=DevType, y=CompTotal, fill = DevType))  +
+        geom_col() + labs(title="Black or of African descent",
+       y="Wage", x="Developer Type", caption="Black or of African descent") +
+  scale_x_discrete(labels = c('A','B','C','D','E','F','G','H','I','J','K','L', 'M','N'))
+ ggplotly(c)
+```
+
+Biracial
+=======================================================================
+
+```{r Biracial}
+b <-ggplot(Biracial, aes(x=DevType, y=CompTotal, fill = DevType))  +
+        geom_col() + labs(title="Biracial",
+       y="Wage", x="Developer Type", caption="Biracial") +
+  scale_x_discrete(labels = c('A','B','C','D','E','F','G','H','I','J','K','L', 'M','N'))
+ ggplotly(b)
 ```
 
